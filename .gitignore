@@ -1,1 +1,21 @@
-node_modules
+# Node.js
+node_modules/
+npm-debug.log
+
+# Build output
+build/
+
+# Environment variables
+.env
+
+# IDE and editor files
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+
+# Testing and coverage files
+coverage/
+
+# Dependencies used only for development
+devDependencies/
