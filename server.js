@@ -15,17 +15,18 @@ app.listen(port, () => {
 });
 
 
+
 const Student = require('./models/student');
 
 // Register a student
-app.post('/register', async (req, res) => {
-  try {
-    const { name, exam1, exam2, exam3 } = req.body;
-    const student = new Student({ name, exam1, exam2, exam3 });
-    await student.save();
-    res.status(201).json(student);
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ error: 'Internal server error' });
-  }
+// Register page
+app.get('/register', (req, res) => {
+  res.render('register');
 });
+
+
+const path = require('path');
+app.set('views', path.join(__dirname, 'views'));
+app.set('view engine', 'ejs');
+
+app.use(express.static(path.join(__dirname, 'public')));
