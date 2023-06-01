@@ -1,3 +1,5 @@
+const path = require('path');
+
 const app = require('../src/server');
 const chai = require('chai');
 const chaiHttp = require('chai-http');
