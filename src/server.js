@@ -4,16 +4,39 @@ const Student = require('./models/Student');
 
 const app = express();
 
-app.use(express.json());
-
 // Connect to MongoDB
-mongoose.connect('<YOUR_MONGODB_CONNECTION_STRING>', { useNewUrlParser: true, useUnifiedTopology: true })
+const dbUrl = 'mongodb+srv://yair:yair@cluster0.ijthrbs.mongodb.net/?retryWrites=true&w=majority';
+const connectionParams = {
+  useNewUrlParser: true,
+  useUnifiedTopology: true,
+};
+
+mongoose
+  .connect(dbUrl, connectionParams)
   .then(() => {
-    console.log('Connected to MongoDB');
+    console.log('Connected to database');
+    // Start the server after successfully connecting to the database
+    const port = process.env.PORT || 3000;
+    app.listen(port, () => {
+      console.log(`Server is running on port ${port}`);
+    });
   })
-  .catch((error) => {
-    console.error('Error connecting to MongoDB:', error);
+  .catch((err) => {
+    console.error(`Error connecting to the database. \n${err}`);
   });
+
+  app.set('view engine', 'ejs');
+  app.set('views', path.join(__dirname, 'views'));
+
+// Serve static files from the 'public' directory
+app.use(express.static(__dirname + '/public'));
+
+// Route for the root URL
+app.get('/', (req, res) => {
+  res.sendFile(__dirname + '/public/index.html');
+});
+
+app.use(express.json());
 
 // Register a new student
 app.post('/register', async (req, res) => {
@@ -44,9 +67,25 @@ app.get('/grades/:name', async (req, res) => {
   }
 });
 
-// Set up other routes and middleware
 
-const port = process.env.PORT || 3000;
-app.listen(port, () => {
-  console.log(`Server is running on port ${port}`);
+
+// Route to display all students and best student average
+app.get('/students', async (req, res) => {
+  try {
+    const students = await Student.find();
+    let bestStudent = null;
+
+    if (students.length > 0) {
+      bestStudent = students.reduce((prev, curr) => {
+        const currAverage = (curr.exam1 + curr.exam2 + curr.exam3) / 3;
+        const prevAverage = (prev.exam1 + prev.exam2 + prev.exam3) / 3;
+        return currAverage > prevAverage ? curr : prev;
+      });
+    }
+
+    res.render('students', { students, bestStudent });
+  } catch (error) {
+    console.error('Error retrieving students:', error);
+    res.status(500).send('Failed to retrieve students');
+  }
 });
