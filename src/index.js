@@ -1,13 +1,14 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const app = express();
-const path = require('path');
+const port = process.env.PORT || 3000;
 
-// Connect to MongoDB
+// Connect to MongoDB Atlas
 mongoose.connect('mongodb+srv://yair:yair@cluster0.ijthrbs.mongodb.net/?retryWrites=true&w=majority', {
   useNewUrlParser: true,
   useUnifiedTopology: true,
 });
+
 
 // Define student schema and model
 const studentSchema = new mongoose.Schema({
@@ -22,11 +23,6 @@ const Student = mongoose.model('Student', studentSchema);
 // Set up routes
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
-
-// Serve the HTML file
-app.get('/', (req, res) => {
-  res.sendFile(path.join(__dirname, 'page.html'));
-});
 
 app.post('/register', async (req, res) => {
   try {
@@ -49,9 +45,6 @@ app.get('/grades', async (req, res) => {
 });
 
 // Start the server
-const port = process.env.PORT || 3000;
 app.listen(port, () => {
   console.log(`Server is running on port ${port}`);
 });
-
-module.exports = app;
