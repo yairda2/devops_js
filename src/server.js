@@ -17,7 +17,7 @@ const studentSchema = new mongoose.Schema({
   exam3: Number,
 });
 
-const Student = mongoose.model('Student', studentSchema);
+const Student = require('./src/student');
 
 // Set up routes
 app.use(express.urlencoded({ extended: true }));
