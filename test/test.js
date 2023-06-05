@@ -13,9 +13,15 @@ describe("Registration API Tests", () => {
     console.log("Server started");
   });
 
-  afterAll(async (done) => {
-    server.close(done);
-  });
+  afterAll(async () => {
+    await new Promise((resolve) => {
+      server.close(() => {
+        console.log("Server closed");
+        resolve();
+      });
+    });
+  }, 5000); // 5-second timeout
+  
 
   it("should register a new student with valid data", async () => {
     const response = await request(app)
