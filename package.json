@@ -1,0 +1,21 @@
+{
+  "name": "grade-register",
+  "version": "1.0.0",
+  "description": "Grade Register Web Application",
+  "main": "server.js",
+  "scripts": {
+    "start": "node public/server.js",
+    "test": "mocha test/test.js"
+  },
+  "dependencies": {
+    "body-parser": "^1.20.2",
+    "chai-http": "^4.3.0",
+    "express": "^4.17.1",
+    "mongodb": "^3.7.3",
+    "mongoose": "^7.2.2"
+  },
+  "devDependencies": {
+    "chai": "^4.3.7",
+    "mocha": "^10.2.0"
+  }
+}
