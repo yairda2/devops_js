@@ -1,6 +1,6 @@
 /* eslint-env node */
 
-const server = require('./server');
+const server = require("./server");
 
 // Additional setup or configuration
 

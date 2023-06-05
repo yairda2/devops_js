@@ -1,28 +1,28 @@
 /* eslint-env node */
 
-const request = require('supertest');
-const app = require('../public/server');
-const { describe, beforeAll, afterAll, it, expect } = require('@jest/globals');
+const request = require("supertest");
+const app = require("../public/server");
+const { describe, beforeAll, afterAll, it, expect } = require("@jest/globals");
 
-describe('Registration API Tests', () => {
+describe("Registration API Tests", () => {
   let server;
 
   beforeAll(async () => {
     // Start the server on random port
     server = app.listen(0);
-    console.log('Server started');
+    console.log("Server started");
   });
 
   afterAll(async () => {
     server.close();
-    console.log('Server closed');
+    console.log("Server closed");
   });
 
-  it('should register a new student with valid data', async () => {
+  it("should register a new student with valid data", async () => {
     const response = await request(app)
-      .post('/register')
+      .post("/register")
       .send({
-        name: 'John Doe',
+        name: "John Doe",
         grades: [80, 90, 95],
       });
 
