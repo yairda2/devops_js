@@ -1,11 +1,32 @@
-describe("Test suite 1:", () => {
-  test("test 1: ", async () => {
-    const res = await request(app).get('/');
-    expect(res.statusCode).toEqual(200);
+/* eslint-env node */
+
+const request = require('supertest');
+const app = require('../public/server');
+const { describe, beforeAll, afterAll, it, expect } = require('@jest/globals');
+
+describe('Registration API Tests', () => {
+  let server;
+
+  beforeAll(async () => {
+    // Start the server on random port
+    server = app.listen(0);
+    console.log('Server started');
   });
 
-  test("test 2: ", async () => {
-    const res = await request(app).get('/1234');
-    expect(res.statusCode).toEqual(400);
+  afterAll(async () => {
+    server.close();
+    console.log('Server closed');
+  });
+
+  it('should register a new student with valid data', async () => {
+    const response = await request(app)
+      .post('/register')
+      .send({
+        name: 'John Doe',
+        grades: [80, 90, 95],
+      });
+
+    expect(response.status).toBe(200);
+    expect(response.body).toBeDefined();
   });
 });

@@ -1,3 +1,7 @@
+/* eslint-env node */
+
+
+
 const express = require('express');
 const mongoose = require('mongoose');
 const path = require('path');
@@ -20,10 +24,21 @@ mongoose.connect('mongodb+srv://yair:yair@cluster0.ijthrbs.mongodb.net/?retryWri
 
 const db = mongoose.connection;
 
+app.get('/', (req, res) => {
+  const fileName = __filename;
+  const code = `const express = require('express');\nconst app = express();\n\napp.get('/', (req, res) => {\n  res.send('Hello, world!');\n});\n\napp.listen(3000, () => {\n  console.log('Server listening on port 3000');\n});`;
+
+  console.log('Current File:', fileName);
+  console.log('Code:', code);
+
+  res.send('Hello, world!');
+});
+
 // Serve the static HTML file
 app.get('/register', (req, res) => {
   res.sendFile(path.join(__dirname, 'register.html'));
 });
+
 // Route for handling user registration
 app.post('/register', (req, res) => {
   const { name, grades } = req.body;
@@ -67,6 +82,15 @@ app.get('/students', (req, res) => {
 });
 
 // Start the server
-app.listen(port, () => {
+const server = app.listen(port, () => {
   console.log(`Server listening on port ${port}`);
 });
+
+// Close the server after all tests are done
+afterAll(() => {
+  
+  server.close();
+  console.log('Server closed');
+})
+
+module.exports = app;
