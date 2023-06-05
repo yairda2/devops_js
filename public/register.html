@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>User Registration</title>
+  <style>
+    #statistics {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      text-align: right;
+    }
+  </style>
+</head>
+<body>
+  <h1>User Registration</h1>
+  <form id="registrationForm">
+    <label for="name">Name:</label>
+    <input type="text" id="name" name="name" required><br><br>
+
+    <label for="grade1">Grade 1:</label>
+    <input type="number" id="grade1" name="grades[]" required><br><br>
+
+    <label for="grade2">Grade 2:</label>
+    <input type="number" id="grade2" name="grades[]" required><br><br>
+
+    <label for="grade3">Grade 3:</label>
+    <input type="number" id="grade3" name="grades[]" required><br><br>
+
+    <input type="submit" value="Register">
+  </form>
+
+  <h2>Registered Users</h2>
+  <ul id="userList"></ul>
+
+  <div id="statistics">
+    <h3>Statistics</h3>
+    <p>Maximum Average Grade:</p>
+    <p id="maxAvg"></p>
+    <p>Mean Average (Name + Average Grade):</p>
+    <p id="meanAvg"></p>
+  </div>
+
+  <script>
+    const registrationForm = document.getElementById('registrationForm');
+    const userList = document.getElementById('userList');
+    const maxAvg = document.getElementById('maxAvg');
+    const meanAvg = document.getElementById('meanAvg');
+
+    // Function to send registration data to the server
+    function registerUser(event) {
+      event.preventDefault();
+
+      const name = document.getElementById('name').value;
+      const grade1 = parseInt(document.getElementById('grade1').value);
+      const grade2 = parseInt(document.getElementById('grade2').value);
+      const grade3 = parseInt(document.getElementById('grade3').value);
+      const grades = [grade1, grade2, grade3];
+
+      const user = {
+        name,
+        grades
+      };
+
+      fetch('/register', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(user)
+      })
+      .then(response => response.text())
+      .then(message => {
+        alert(message);
+        registrationForm.reset();
+        fetchUsers();
+      })
+      .catch(error => console.error('Error:', error));
+    }
+
+    // Function to fetch and display user data from the server
+    function fetchUsers() {
+      fetch('/students')
+        .then(response => response.json())
+        .then(users => {
+          userList.innerHTML = '';
+          users.forEach(user => {
+            const listItem = document.createElement('li');
+            listItem.textContent = `Name: ${user.name}, Grades: ${user.grades.join(', ')}`;
+            userList.appendChild(listItem);
+          });
+
+          calculateStatistics(users);
+        })
+        .catch(error => console.error('Error:', error));
+    }
+
+    // Function to calculate and display statistics
+    function calculateStatistics(users) {
+      const averages = users.map(user => ({
+        name: user.name,
+        average: user.grades.reduce((sum, grade) => sum + grade, 0) / user.grades.length
+      }));
+
+      // Find the maximum average grade
+      const maxAverage = Math.max(...averages.map(user => user.average));
+      const userWithMaxAverage = averages.find(user => user.average === maxAverage);
+
+      // Calculate the mean average (Name + Average Grade)
+      const meanAverage = averages.reduce((sum, user) => sum + user.average, 0) / averages.length;
+
+      maxAvg.textContent = `${userWithMaxAverage.name}: ${maxAverage.toFixed(2)}`;
+      meanAvg.textContent = `${meanAverage.toFixed(2)}`;
+    }
+
+    registrationForm.addEventListener('submit', registerUser);
+
+    // Fetch users when the page loads
+    fetchUsers();
+  </script>
+</body>
+</html>

@@ -6,11 +6,11 @@ const studentSchema = new mongoose.Schema({
     required: true
   },
   grades: [{
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'Grade'
+    type: Number,
+    required: true
   }]
 });
 
 const Student = mongoose.model('Student', studentSchema);
 
-module.exports = Student;
+module.exports = { Student };

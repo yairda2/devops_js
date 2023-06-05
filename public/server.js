@@ -1,36 +1,72 @@
 const express = require('express');
 const mongoose = require('mongoose');
-const bodyParser = require('body-parser');
-const studentRouter = require('../routes/studentRouter');
-const gradeRouter = require('../routes/gradeRouter');
+const path = require('path');
 
+const { Student, Grade } = require('../models/student');
+
+const port = process.env.PORT || 3000;
 const app = express();
-const port = 3000;
-const dbName = 'yairdb';
-const url = 'mongodb+srv://yair:yair@cluster0.ijthrbs.mongodb.net/' + dbName + '?retryWrites=true&w=majority';
+app.use(express.json());
 
-// MongoDB connection
-mongoose.connect(url, { useNewUrlParser: true, useUnifiedTopology: true })
-  .then(() => {
-    console.log('Connected to MongoDB');
-  })
-  .catch((err) => {
-    console.error('Error connecting to MongoDB:', err);
-  });
-
-// Serve static files from the "public" directory
-app.use(express.static('public'));
-
-// Parse incoming request bodies as JSON
-app.use(bodyParser.json());
-
-// Routes
-app.use('/students', studentRouter);
-app.use('/grades', gradeRouter);
-
-// Start the server
-const server = app.listen(port, () => {
-  console.log(`Server is listening on port ${port}`);
+// Connect to MongoDB
+mongoose.connect('mongodb+srv://yair:yair@cluster0.ijthrbs.mongodb.net/?retryWrites=true&w=majority', {
+  useNewUrlParser: true,
+  useUnifiedTopology: true,
+}).then(() => {
+  console.log('Connected to MongoDB');
+}).catch((error) => {
+  console.log('Error connecting to MongoDB:', error);
 });
 
-module.exports = { app, server };
+const db = mongoose.connection;
+
+// Serve the static HTML file
+app.get('/register', (req, res) => {
+  res.sendFile(path.join(__dirname, 'register.html'));
+});
+// Route for handling user registration
+app.post('/register', (req, res) => {
+  const { name, grades } = req.body;
+
+  // Data checks for the name
+  if (!name || typeof name !== 'string' || name.length > 20 || /\d/.test(name)) {
+    return res.status(400).send('Invalid name');
+  }
+
+  // Data checks for the grades
+  if (!Array.isArray(grades) || grades.some(grade => typeof grade !== 'number' || grade < 0 || grade > 100)) {
+    return res.status(400).send('Invalid grades');
+  }
+
+  const student = new Student({
+    name,
+    grades,
+  });
+
+  console.log('Received name:', name);
+  console.log('Received grades:', grades);
+
+  db.collection('students').insertOne(student, (error, result) => {
+    if (error) {
+      res.status(400).send('Error registering student');
+    } else {
+      res.status(200).json(result);
+    }
+  });
+});
+
+// Route for fetching all student data from the database
+app.get('/students', (req, res) => {
+  Student.find()
+    .then((students) => {
+      res.status(200).json(students);
+    })
+    .catch((error) => {
+      res.status(500).send('Error fetching students');
+    });
+});
+
+// Start the server
+app.listen(port, () => {
+  console.log(`Server listening on port ${port}`);
+});
