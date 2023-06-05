@@ -13,9 +13,8 @@ describe("Registration API Tests", () => {
     console.log("Server started");
   });
 
-  afterAll(async () => {
-    server.close();
-    console.log("Server closed");
+  afterAll(async (done) => {
+    server.close(done);
   });
 
   it("should register a new student with valid data", async () => {

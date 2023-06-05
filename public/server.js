@@ -4,7 +4,7 @@ const express = require("express");
 const mongoose = require("mongoose");
 const path = require("path");
 
-const { Student, Grade } = require("../models/student");
+const { Student } = require("../models/student");
 
 const port = process.env.PORT || 3000;
 const app = express();
@@ -90,7 +90,7 @@ app.get("/students", (req, res) => {
     .then((students) => {
       res.status(200).json(students);
     })
-    .catch((error) => {
+    .catch(() => {
       res.status(500).send("Error fetching students");
     });
 });
@@ -100,9 +100,8 @@ const server = app.listen(port, () => {
   console.log(`Server listening on port ${port}`);
 });
 
-// Close the server after all tests are done
-afterAll(() => {
-  server.close();
+// Close the server
+server.on("close", () => {
   console.log("Server closed");
 });
 
