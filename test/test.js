@@ -21,7 +21,6 @@ describe("Registration API Tests", () => {
       });
     });
   }, 5000); // 5-second timeout
-  
 
   it("should register a new student with valid data", async () => {
     const response = await request(app)
