@@ -26,11 +26,18 @@
   <h2>Registered Users</h2>
   <ul id="userList"></ul>  
 
+  <div id="statistics">
+    <div id="maxAvg"></div>
+    <div id="minAvg"></div>
+    <div id="meanAvg"></div>
+  </div>
+
   <script>
     const registrationForm = document.getElementById('registrationForm');
     const userList = document.getElementById('userList');
     const maxAvg = document.getElementById('maxAvg');
     const minAvg = document.getElementById('minAvg');
+    const meanAvg = document.getElementById('meanAvg');
 
     // Function to send registration data to the server
     function registerUser(event) {
@@ -74,10 +81,7 @@
             listItem.textContent = `Name: ${user.name}, Grades: ${user.grades.join(', ')}`;
             userList.appendChild(listItem);
           });
-          // print the users
-          console.log(users);
-          //calculateStatistics(users);
-
+          calculateStatistics(users);
         })
         .catch(error => console.error('Error:', error));
     }
@@ -97,25 +101,27 @@
       const userWithMaxAverage = averages.find(user => user.average === maxAverage);
       const userWithMinAverage = averages.find(user => user.average === minAverage);
 
-      // Calculate the mean average (Name + Average Grade)
-      const meanAverage = averages.reduce((sum, user) => sum + user.average, 0) / averages.length;
-
       // Clear previous content
       maxAvg.innerHTML = '';
       minAvg.innerHTML = '';
+      meanAvg.innerHTML = '';
 
-      // Create text nodes for maximum and minimum average grades
+      // Create text nodes for maximum, minimum, and mean average grades
       const maxAvgText = document.createTextNode(`${userWithMaxAverage.name}: ${maxAverage.toFixed(2)}`);
       const minAvgText = document.createTextNode(`${userWithMinAverage.name}: ${minAverage.toFixed(2)}`);
+      const meanAvgText = document.createTextNode(`Mean Average: ${calculateMeanAverage(averages).toFixed(2)}`);
 
       // Append text nodes to the HTML elements
       maxAvg.appendChild(maxAvgText);
       minAvg.appendChild(minAvgText);
-
-      // Set the mean average
-      meanAvg.textContent = meanAverage.toFixed(2);
+      meanAvg.appendChild(meanAvgText);
     }
 
+    // Function to calculate the mean average grade
+    function calculateMeanAverage(averages) {
+      const sum = averages.reduce((total, user) => total + user.average, 0);
+      return sum / averages.length;
+    }
 
     registrationForm.addEventListener('submit', registerUser);
 
